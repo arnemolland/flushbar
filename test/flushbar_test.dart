@@ -22,7 +22,7 @@ void main() {
     expect(flushbar.leftBarIndicatorColor, null);
     expect(flushbar.boxShadows, null);
     expect(flushbar.backgroundGradient, null);
-    expect(flushbar.mainButton, null);
+    expect(flushbar.button, null);
     expect(flushbar.borderRadius, 0.0);
     expect(flushbar.borderWidth, 1.0);
     expect(flushbar.borderColor, null);
@@ -47,6 +47,4 @@ void main() {
     expect(flushbar.isDismissed(), false);
     expect(await flushbar.dismiss(), null);
   });
-
-
 }

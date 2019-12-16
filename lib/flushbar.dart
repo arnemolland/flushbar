@@ -16,7 +16,9 @@ class Flushbar<T extends Object> extends StatefulWidget {
   Flushbar(
       {Key key,
       String title,
+      TextStyle titleStyle,
       String message,
+      TextStyle messageStyle,
       Widget titleText,
       Widget messageText,
       Widget icon,
@@ -31,7 +33,7 @@ class Flushbar<T extends Object> extends StatefulWidget {
       Color leftBarIndicatorColor,
       List<BoxShadow> boxShadows,
       Gradient backgroundGradient,
-      FlatButton mainButton,
+      Widget button,
       OnTap onTap,
       Duration duration,
       bool isDismissible = true,
@@ -51,7 +53,9 @@ class Flushbar<T extends Object> extends StatefulWidget {
       Color overlayColor = Colors.transparent,
       Form userInputForm})
       : this.title = title,
+        this.titleStyle = titleStyle,
         this.message = message,
+        this.messageStyle = messageStyle,
         this.titleText = titleText,
         this.messageText = messageText,
         this.icon = icon,
@@ -66,7 +70,7 @@ class Flushbar<T extends Object> extends StatefulWidget {
         this.leftBarIndicatorColor = leftBarIndicatorColor,
         this.boxShadows = boxShadows,
         this.backgroundGradient = backgroundGradient,
-        this.mainButton = mainButton,
+        this.button = button,
         this.onTap = onTap,
         this.duration = duration,
         this.isDismissible = isDismissible,
@@ -94,8 +98,14 @@ class Flushbar<T extends Object> extends StatefulWidget {
   /// The title displayed to the user
   final String title;
 
+  /// The TextStyle of the title
+  final TextStyle titleStyle;
+
   /// The message displayed to the user.
   final String message;
+
+  /// The TextStyle of the message
+  final TextStyle messageStyle;
 
   /// Replaces [title]. Although this accepts a [Widget], it is meant to receive [Text] or [RichText]
   final Widget titleText;
@@ -126,9 +136,9 @@ class Flushbar<T extends Object> extends StatefulWidget {
   final bool shouldIconPulse;
 
   /// A [FlatButton] widget if you need an action from the user.
-  final FlatButton mainButton;
+  final Widget button;
 
-  /// A callback that registers the user's click anywhere. An alternative to [mainButton]
+  /// A callback that registers the user's click anywhere. An alternative to [button]
   final OnTap onTap;
 
   /// How long until Flushbar will hide itself (be dismissed). To make it indefinite, leave it null.
@@ -282,7 +292,9 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
   void initState() {
     super.initState();
 
-    assert(((widget.userInputForm != null || ((widget.message != null && widget.message.isNotEmpty) || widget.messageText != null))),
+    assert(
+        ((widget.userInputForm != null ||
+            ((widget.message != null && widget.message.isNotEmpty) || widget.messageText != null))),
         "A message is mandatory if you are not using userInputForm. Set either a message or messageText");
 
     _isTitlePresent = (widget.title != null || widget.titleText != null);
@@ -357,7 +369,8 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
       };
       widget.progressIndicatorController.addListener(_progressListener);
 
-      _progressAnimation = CurvedAnimation(curve: Curves.linear, parent: widget.progressIndicatorController);
+      _progressAnimation =
+          CurvedAnimation(curve: Curves.linear, parent: widget.progressIndicatorController);
     }
   }
 
@@ -366,7 +379,9 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
     return Align(
       heightFactor: 1.0,
       child: Material(
-        color: widget.flushbarStyle == FlushbarStyle.FLOATING ? Colors.transparent : widget.backgroundColor,
+        color: widget.flushbarStyle == FlushbarStyle.FLOATING
+            ? Colors.transparent
+            : widget.backgroundColor,
         child: SafeArea(
           minimum: widget.flushbarPosition == FlushbarPosition.BOTTOM
               ? EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom)
@@ -428,7 +443,9 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
         gradient: widget.backgroundGradient,
         boxShadow: widget.boxShadows,
         borderRadius: BorderRadius.circular(widget.borderRadius),
-        border: widget.borderColor != null ? Border.all(color: widget.borderColor, width: widget.borderWidth) : null,
+        border: widget.borderColor != null
+            ? Border.all(color: widget.borderColor, width: widget.borderWidth)
+            : null,
       ),
       child: Padding(
         padding: const EdgeInsets.only(left: 8.0, right: 8.0, bottom: 8.0, top: 16.0),
@@ -453,14 +470,17 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
         gradient: widget.backgroundGradient,
         boxShadow: widget.boxShadows,
         borderRadius: BorderRadius.circular(widget.borderRadius),
-        border: widget.borderColor != null ? Border.all(color: widget.borderColor, width: widget.borderWidth) : null,
+        border: widget.borderColor != null
+            ? Border.all(color: widget.borderColor, width: widget.borderWidth)
+            : null,
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           widget.showProgressIndicator
               ? LinearProgressIndicator(
-                  value: widget.progressIndicatorController != null ? _progressAnimation.value : null,
+                  value:
+                      widget.progressIndicatorController != null ? _progressAnimation.value : null,
                   backgroundColor: widget.progressIndicatorBackgroundColor,
                   valueColor: widget.progressIndicatorValueColor,
                 )
@@ -487,7 +507,7 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
       iconPadding = widget.padding.left;
     }
 
-    if (widget.icon == null && widget.mainButton == null) {
+    if (widget.icon == null && widget.button == null) {
       return [
         _buildLeftBarIndicator(),
         Expanded(
@@ -519,7 +539,7 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
           ),
         ),
       ];
-    } else if (widget.icon != null && widget.mainButton == null) {
+    } else if (widget.icon != null && widget.button == null) {
       return <Widget>[
         _buildLeftBarIndicator(),
         ConstrainedBox(
@@ -555,7 +575,7 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
           ),
         ),
       ];
-    } else if (widget.icon == null && widget.mainButton != null) {
+    } else if (widget.icon == null && widget.button != null) {
       return <Widget>[
         _buildLeftBarIndicator(),
         Expanded(
@@ -588,7 +608,7 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
         ),
         Padding(
           padding: EdgeInsets.only(right: buttonRightPadding),
-          child: _getMainActionButton(),
+          child: _getActionButton(),
         ),
       ];
     } else {
@@ -628,7 +648,7 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
         ),
         Padding(
               padding: EdgeInsets.only(right: buttonRightPadding),
-              child: _getMainActionButton(),
+              child: _getActionButton(),
             ) ??
             _emptyWidget,
       ];
@@ -672,22 +692,19 @@ class _FlushbarState<K extends Object> extends State<Flushbar> with TickerProvid
   Widget _getTitleText() {
     return widget.titleText != null
         ? widget.titleText
-        : Text(
-            widget.title ?? "",
-            style: TextStyle(fontSize: 16.0, color: Colors.white, fontWeight: FontWeight.bold),
-          );
+        : Text(widget.title ?? "", style: widget.titleStyle);
   }
 
   Text _getDefaultNotificationText() {
     return Text(
       widget.message ?? "",
-      style: TextStyle(fontSize: 14.0, color: Colors.white),
+      style: widget.messageStyle,
     );
   }
 
-  FlatButton _getMainActionButton() {
-    if (widget.mainButton != null) {
-      return widget.mainButton;
+  Widget _getActionButton() {
+    if (widget.button != null) {
+      return widget.button;
     } else {
       return null;
     }
